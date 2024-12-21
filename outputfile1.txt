@@ -1,2 +1,0 @@
-> CREATE outputfile1.txt;
-> null ;
