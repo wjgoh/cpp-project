@@ -5,7 +5,7 @@
 #include <vector>
 using namespace std;
 
-struct Information{
+struct Information {
     int customer_id;
     string customer_name;
     string customer_city;
@@ -17,18 +17,17 @@ struct Information{
 
 // function prototypes
 void create_output_screen_and_file();
-void create_database(const string line, vector<Information> customer);
+void create_database(const string line, vector<Information>& customer);
 void create_table();
 void insert_into_table();
-void select_all_from_table_in_csv_mode(vector<Information> customer);
+void select_all_from_table_in_csv_mode(const vector<Information>& customer);
 
 // function definitions
 string outputFileName = "outputfile1.txt";
 ofstream outputFile(outputFileName);
+bool headerPrinted = false;
 
 void create_output_screen_and_file() {
-
-
     if (!outputFile.is_open()) {
         cout << "Unable to create output file" << endl;
         return;
@@ -36,97 +35,74 @@ void create_output_screen_and_file() {
 
     cout << "> CREATE " << outputFileName << ";" << endl;
     outputFile << "> CREATE " << outputFileName << ";" << endl;
-
-
 }
 
-void create_database(const string line, vector<Information> customer) {
-    outputFile << "> null " << ";" << endl;
-    // Implementation here
+void create_database(const string line, vector<Information>& customer) {
     size_t values_pos = line.find("VALUES");
 
     string values_eli = line.substr(values_pos); // To remove the word "VALUES"
     string values_line = values_eli.substr(values_eli.find("(") + 1, values_eli.find(")") - values_eli.find("(") - 1); // To remove the parenthesis()
 
-    //cout << values_line << endl;
-
     stringstream ss(values_line);
     string values_sep;
     vector<string> values;
-    while ( getline(ss, values_sep, ',') ) // To separate a comma(,) between the data
+    while (getline(ss, values_sep, ',')) // To separate a comma(,) between the data
     {
         values.push_back(values_sep);
     }
 
     Information customer_info;
-    for (int i = 0; i < values.size(); i++)
-    {
-        if (values[i].find("'") != string::npos)
-        {
+    for (int i = 0; i < values.size(); i++) {
+        if (values[i].find("'") != string::npos) {
             values[i] = values[i].substr(1, values[i].size() - 2); // To eliminate the single quote(')
-            if (i == 1)
-            {
+            if (i == 1) {
                 customer_info.customer_name = values[i]; // To collect the string data
-            }
-            else if (i == 2)
-            {
+            } else if (i == 2) {
                 customer_info.customer_city = values[i];
-            }
-            else if (i == 3)
-            {
+            } else if (i == 3) {
                 customer_info.customer_state = values[i];
-            }
-            else if (i == 4)
-            {
+            } else if (i == 4) {
                 customer_info.customer_country = values[i];
-            }
-            else if (i == 5)
-            {
+            } else if (i == 5) {
                 customer_info.customer_phone = values[i];
-            }
-            else if (i == 6)
-            {
+            } else if (i == 6) {
                 customer_info.customer_email = values[i];
             }
-        }
-        else
-        {
+        } else {
             int number = stoi(values[i]); // To convert string to integer
-            if (i == 0)
-            {
+            if (i == 0) {
                 customer_info.customer_id = number; // To collect the integer data
             }
         }
     }
 
     customer.push_back(customer_info); // Update the vector structure
-    select_all_from_table_in_csv_mode(customer);
-    //cout << customer_info.customer_id << customer_info.customer_name << customer_info.customer_city << customer_info.customer_state << customer_info.customer_country << customer_info.customer_phone << customer_info.customer_email << endl;
-
 }
 
 void create_table() {
-    // Implementation here
+    cout << "> CREATE TABLE customer(\n"
+         << "customer_id INT,\ncustomer_name TEXT,\n"
+         << "customer_city TEXT,\ncustomer_state TEXT,\n"
+         << "customer_country TEXT,\ncustomer_phone TEXT,\n"
+         << "customer_email TEXT\n);" << endl;
+    outputFile << "> CREATE TABLE customer(\n"
+               << "customer_id INT,\ncustomer_name TEXT,\n"
+               << "customer_city TEXT,\ncustomer_state TEXT,\n"
+               << "customer_country TEXT,\ncustomer_phone TEXT,\n"
+               << "customer_email TEXT\n);" << endl;
 }
 
 void insert_into_table() {
     // Implementation here
 }
 
-void select_all_from_table_in_csv_mode(vector<Information> customer) {
-
-    // Define sample table data using vectors
-    /*vector<int> customer_id = {1, 2, 3, 4};
-    vector<string> customer_name = {"name1", "name2", "name3", "name4"};
-    vector<string> customer_city = {"city1", "city2", "city3", "city4"};
-    vector<string> customer_state = {"state1", "state2", "state3", "state4"};
-    vector<string> customer_country = {"country1", "country2", "country3", "country4"};
-    vector<string> customer_phone = {"phone1", "phone2", "phone3", "phone4"};
-    vector<string> customer_email = {"email1", "email2", "email3", "email4"};*/
-
-    // Print table header in CSV format
-    cout << "customer_id,customer_name,customer_city,customer_state,customer_country,customer_phone,customer_email\n";
-    outputFile << "customer_id,customer_name,customer_city,customer_state,customer_country,customer_phone,customer_email\n";
+void select_all_from_table_in_csv_mode(const vector<Information>& customer) {
+    if (!headerPrinted) {
+        // Print table header in CSV format
+        cout << "customer_id,customer_name,customer_city,customer_state,customer_country,customer_phone,customer_email\n";
+        outputFile << "customer_id,customer_name,customer_city,customer_state,customer_country,customer_phone,customer_email\n";
+        headerPrinted = true;
+    }
 
     // Print table data in CSV format
     for (const auto& c : customer) {
@@ -135,7 +111,6 @@ void select_all_from_table_in_csv_mode(vector<Information> customer) {
     }
 }
 
-
 int main() {
     vector<Information> customer;
 
@@ -143,8 +118,6 @@ int main() {
     string fileOutputName;
 
     string fileInputName = "fileInput1.mdb";
-    //string fileInputName = "C:\\yourname\\fileInput2.mdb";
-    //string fileInputName = "C:\\yourname\\fileInput3.mdb";
 
     fileInput.open(fileInputName);
 
@@ -153,53 +126,35 @@ int main() {
         exit(-1);
     }
 
+    create_output_screen_and_file();
+
     string line;
     while (getline(fileInput, line))
-        if (!line.empty())
-        {
-            if (line.find("CREATE TABLE") == 0)
-            {
+        if (!line.empty()) {
+            if (line.find("CREATE TABLE") == 0) {
+                create_table();
+            } else if (line.find("DATABASE") == 0) {
                 //cout << line << endl;
-            }
-            else if (line.find("DATABASE") == 0)
-            {
+            } else if (line.find("CREATE") == 0) {
+                //cout << line << endl; 
+            } else if (line.find("INSERT INTO") == 0) {
                 //cout << line << endl;
-            }
-            else if (line.find("CREATE") == 0)
-            {
-                //cout << line << endl;
-            }
-            else if (line.find("INSERT INTO") == 0)
-            {
-                //cout << line << endl;
-            }
-            else if (line.find("VALUES") != string::npos)
-            {
+            } else if (line.find("VALUES") != string::npos) {
                 create_database(line, customer);
-            }
-            else if (line.find("SELECT * FROM") == 0)
-            {
+            } else if (line.find("SELECT * FROM") == 0) {
                 select_all_from_table_in_csv_mode(customer);
-            }
-            else
-            {
+            } else {
                 //cout << "no keyword" << endl;
             }
-        }
-        else
-        {
+        } else {
             //cout << "----" << endl;
         }
 
-    //create_output_screen_and_file();
-    //create_database();
-
     fileInput.close();
-
     outputFile.close();
 
-    //fileOutputName = "fileOutput1.txt"; //incorrect
-    //fileInput.close(); CREATE fileOutputName << "";
+    // Print the customer data in CSV format once
+    select_all_from_table_in_csv_mode(customer);
 
     cout << "CREATE" << endl;
     cout << "DATABASES" << endl;
