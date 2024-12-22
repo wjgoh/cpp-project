@@ -16,37 +16,46 @@ struct Information {
 };
 
 // function prototypes
-void create_output_screen_and_file();
-void create_database(const string line, vector<Information>& customer);
+void create_output_screen_and_file(const string& line);
+void create_database(const string& line, vector<Information>& customer);
 void create_table();
 void insert_into_table();
 void select_all_from_table_in_csv_mode(const vector<Information>& customer);
 
 // function definitions
-string outputFileName = "outputfile1.txt";
-ofstream outputFile(outputFileName);
+//string outputFileName = "outputfile1.txt";
+ofstream outputFile;
 bool headerPrinted = false;
 
-void create_output_screen_and_file() {
+void create_output_screen_and_file(const string& line) {
+    size_t file_begin = line.find(" ") + 1; //Get the start position of output file name
+    size_t file_end = line.find(";"); //Get the end position of output file name
+    string outputFileName = line.substr(file_begin, file_end - file_begin); //Get the output file name
+
+    outputFile.open(outputFileName);
+
     if (!outputFile.is_open()) {
         cout << "Unable to create output file" << endl;
         return;
     }
 
-    cout << "> CREATE " << outputFileName << ";" << endl;
-    outputFile << "> CREATE " << outputFileName << ";" << endl;
+    //cout << "> CREATE " << outputFileName << ";" << endl;
+    cout << "> " << line << endl;
+    //outputFile << "> CREATE " << outputFileName << ";" << endl;
+    outputFile << "> " << line << endl;
+
 }
 
-void create_database(const string line, vector<Information>& customer) {
+void create_database(const string& line, vector<Information>& customer) {
     size_t values_pos = line.find("VALUES");
 
-    string values_eli = line.substr(values_pos); // To remove the word "VALUES"
+    string values_eli = line.substr(values_pos); //To remove the word "VALUES"
     string values_line = values_eli.substr(values_eli.find("(") + 1, values_eli.find(")") - values_eli.find("(") - 1); // To remove the parenthesis()
 
     stringstream ss(values_line);
     string values_sep;
     vector<string> values;
-    while (getline(ss, values_sep, ',')) // To separate a comma(,) between the data
+    while (getline(ss, values_sep, ',')) //To separate a comma(,) between the data
     {
         values.push_back(values_sep);
     }
@@ -54,9 +63,9 @@ void create_database(const string line, vector<Information>& customer) {
     Information customer_info;
     for (int i = 0; i < values.size(); i++) {
         if (values[i].find("'") != string::npos) {
-            values[i] = values[i].substr(1, values[i].size() - 2); // To eliminate the single quote(')
+            values[i] = values[i].substr(1, values[i].size() - 2); //To eliminate the single quote(')
             if (i == 1) {
-                customer_info.customer_name = values[i]; // To collect the string data
+                customer_info.customer_name = values[i]; //To collect the string data
             } else if (i == 2) {
                 customer_info.customer_city = values[i];
             } else if (i == 3) {
@@ -69,14 +78,14 @@ void create_database(const string line, vector<Information>& customer) {
                 customer_info.customer_email = values[i];
             }
         } else {
-            int number = stoi(values[i]); // To convert string to integer
+            int number = stoi(values[i]); //To convert string to integer
             if (i == 0) {
-                customer_info.customer_id = number; // To collect the integer data
+                customer_info.customer_id = number; //To collect the integer data
             }
         }
     }
 
-    customer.push_back(customer_info); // Update the vector structure
+    customer.push_back(customer_info); //Update the vector structure
 }
 
 void create_table() {
@@ -126,7 +135,7 @@ int main() {
         exit(-1);
     }
 
-    create_output_screen_and_file();
+    //create_output_screen_and_file();
 
     string line;
     while (getline(fileInput, line))
@@ -136,7 +145,7 @@ int main() {
             } else if (line.find("DATABASE") == 0) {
                 //cout << line << endl;
             } else if (line.find("CREATE") == 0) {
-                //cout << line << endl; 
+                create_output_screen_and_file(line);
             } else if (line.find("INSERT INTO") == 0) {
                 //cout << line << endl;
             } else if (line.find("VALUES") != string::npos) {

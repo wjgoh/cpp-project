@@ -16,13 +16,35 @@ struct Information{
 };
 
 // Function Prototype
-void output_screen_file();
-void database(const string line, vector<Information> customer);
+void output_screen_file(const string& line);
+void database(const string line, vector<Information>& customer);
 void create_table();
 void insert_into_table();
-void csv_mode();
+void csv_mode(const vector<Information>& customer);
 
-void database(const string line, vector<Information> customer)
+void output_screen_file(const string& line)
+{
+    size_t file_begin = line.find(" ") + 1;
+    size_t file_end = line.find(";");
+
+    string fileOutputName = line.substr(file_begin, file_end - file_begin);
+
+    //cout << fileOutputName << endl;
+    ofstream fileOutput;
+
+    fileOutput.open(fileOutputName);
+
+    if (!fileOutput.is_open())
+    {
+        cout << "Unable to create output file!" << endl;
+        return;
+    }
+
+    cout << "> " << line << endl;
+    fileOutput << "> " << line << endl;
+}
+
+void database(const string line, vector<Information>& customer)
 {
     size_t values_pos = line.find("VALUES");
 
@@ -79,8 +101,8 @@ void database(const string line, vector<Information> customer)
             }
         }
     }
-
-    cout << customer_info.customer_id << customer_info.customer_name << customer_info.customer_city << customer_info.customer_state << customer_info.customer_country << customer_info.customer_phone << customer_info.customer_email << endl;
+    customer.push_back(customer_info);
+    //cout << customer_info.customer_id << customer_info.customer_name << customer_info.customer_city << customer_info.customer_state << customer_info.customer_country << customer_info.customer_phone << customer_info.customer_email << endl;
 
     //insert_into_table(id, name, age, city, state, phone, email);
 
@@ -108,15 +130,25 @@ void database(const string line, vector<Information> customer)
     }*/
 }
 
+void csv_mode(const vector<Information>& customer)
+{
+    cout << "customer_id,customer_name,customer_city,customer_state,customer_country,customer_phone,customer_email\n";
+
+    for (const auto& c : customer) {
+        cout << c.customer_id << "," << c.customer_name << "," << c.customer_city << "," << c.customer_state << "," << c.customer_country << "," << c.customer_phone << "," << c.customer_email << "\n";
+        //outputFile << c.customer_id << "," << c.customer_name << "," << c.customer_city << "," << c.customer_state << "," << c.customer_country << "," << c.customer_phone << "," << c.customer_email << "\n";
+    }
+}
+
 int main()
 {
     vector<Information> customer;
 
     ifstream fileInput;
 
-    string fileInputName = "data_input.mdb";
+    string fileInputName = "fileInput1.mdb";
 
-    fileInput.open("data_input.mdb");
+    fileInput.open("fileInput1.mdb");
 
     if ( !fileInput.is_open() )
     {
@@ -138,7 +170,7 @@ int main()
             }
             else if (line.find("CREATE") == 0)
             {
-                cout << line << endl;
+                output_screen_file(line);
             }
             else if (line.find("INSERT INTO") == 0)
             {
@@ -150,7 +182,7 @@ int main()
             }
             else if (line.find("SELECT * FROM") == 0)
             {
-                cout << line << endl;
+                csv_mode(customer);
             }
             else
             {
