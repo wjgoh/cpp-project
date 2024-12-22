@@ -1,4 +1,4 @@
-> CREATE outputfile1.txt;
+> CREATE fileOutput1.txt;
 > CREATE TABLE customer(
 customer_id INT,
 customer_name TEXT,
