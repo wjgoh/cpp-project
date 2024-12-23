@@ -1,4 +1,5 @@
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -107,19 +108,34 @@ void create_database(const string &line, vector<Information> &customer)
     customer.push_back(customer_info); // Update the vector structure
 }
 
-void create_table()
-{
-    cout << "> CREATE TABLE customer(\n"
-         << "customer_id INT,\ncustomer_name TEXT,\n"
-         << "customer_city TEXT,\ncustomer_state TEXT,\n"
-         << "customer_country TEXT,\ncustomer_phone TEXT,\n"
-         << "customer_email TEXT\n);" << endl;
-    outputFile << "> CREATE TABLE customer(\n"
-               << "customer_id INT,\ncustomer_name TEXT,\n"
-               << "customer_city TEXT,\ncustomer_state TEXT,\n"
-               << "customer_country TEXT,\ncustomer_phone TEXT,\n"
-               << "customer_email TEXT\n);" << endl;
+void create_table() {
+    cout << "> CREATE TABLE customer:" << endl;
+    outputFile << "> CREATE TABLE customer:" << endl;
+
+    string headers[] = {
+        "customer_id",
+        "customer_name",
+        "customer_city",
+        "customer_state",
+        "customer_country",
+        "customer_phone",
+        "customer_email",
+    };
+
+    // Initialize constants
+
+    const int numColumn = sizeof(headers) / sizeof(headers[0]); // Number of columns
+
+
+// print column names
+    for (int i = 0; i < numColumn; i++) {
+        cout  << headers[i] <<endl;
+        outputFile << headers[i]<< endl;
+
+
 }
+}
+
 
 void insert_into_table(const string &line, vector<Information> &customer)
 {
