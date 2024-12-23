@@ -1,5 +1,21 @@
+//*******************************************************************************************
+//Program: Bachelor of Computer Science
+//Course: CPP6114 Programming Fundamentals
+//Lecture Class: TC2L
+//Tutorial Class: TT4L
+//Trimester: 2430
+//Member_1: ID | NAME | EMAIL | PHONE
+//Member_2: ID | NAME | EMAIL | PHONE
+//Member_3: ID | NAME | EMAIL | PHONE
+//Member_4: 242UC244S3 | TENG MING HEIN | TENG.MING.HEIN@student.mmu.edu.my | 016-7831558
+//*******************************************************************************************
+//Task Distribution
+//Member_1:
+//Member_2:
+//Member_3:
+//Member_4:
+//*******************************************************************************************
 #include <iostream>
-#include <iomanip>
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -20,7 +36,7 @@ struct Information
 // function prototypes
 void create_output_screen_and_file(const string &line);
 void create_database(const string &line, vector<Information> &customer);
-void create_table();
+void create_table(const string& line, const string &command);
 void insert_into_table();
 void select_all_from_table_in_csv_mode(const vector<Information> &customer);
 
@@ -108,8 +124,8 @@ void create_database(const string &line, vector<Information> &customer)
     customer.push_back(customer_info); // Update the vector structure
 }
 
-void create_table() {
-    cout << "> CREATE TABLE customer:" << endl;
+void create_table(const string& line, const string &command) {
+    /*cout << "> CREATE TABLE customer:" << endl;
     outputFile << "> CREATE TABLE customer:" << endl;
 
     string headers[] = {
@@ -133,9 +149,42 @@ void create_table() {
         outputFile << headers[i]<< endl;
 
 
-}
-}
+*/
+    size_t tableName_begin = line.find("TABLE") + 6;
+    size_t tableName_end = line.find("(");
+    string tableName = line.substr(tableName_begin, tableName_end - tableName_begin);
 
+    size_t header_begin = command.find("(") + 1;
+    size_t header_end = command.find(")");
+    string header_line = command.substr(header_begin, header_end - header_begin);
+
+    stringstream ss(header_line);
+    string header_sep;
+    vector<string> columns;
+
+    while ( getline(ss, header_sep, ',') )
+    {
+        string header_name = header_sep.substr(0, header_sep.find(" "));
+        string data_type = header_sep.substr(header_sep.find(" ") + 1);
+
+        string column = header_name + " " + data_type;
+
+        columns.push_back(column);
+    }
+
+    for (size_t i = 0; i < columns.size(); i++)
+    {
+        if (i == columns.size() - 1)
+        {
+            cout << columns[i] << endl;
+        }
+        else
+        {
+            cout << columns[i] << "," << endl;
+        }
+    }
+
+}
 
 void insert_into_table(const string &line, vector<Information> &customer)
 {
@@ -220,7 +269,18 @@ int main()
         {
             if (line.find("CREATE TABLE") == 0)
             {
-                create_table();
+                string command;
+                while (getline(fileInput, command))
+                {
+                    if (command.find("INT") != string::npos || command.find("TEXT") != string::npos)
+                    {
+                        create_table(line, command);
+                    }
+                    else if (command.find(");"))
+                    {
+                        break;
+                    }
+                }
             }
             else if (line.find("DATABASE") == 0)
             {
