@@ -196,6 +196,9 @@ void select_all_from_table_in_csv_mode(const vector<Information> &customer)
 
 int main()
 {
+    vector<Information> customer;
+    vector<Row> table_Row;
+
     ifstream fileInput;
     string fileOutputName;
 
@@ -207,53 +210,48 @@ int main()
         exit(-1);
     }
 
-    vector<Information> customer;
-    vector<Row> table_Row;
-
     string line;
-    while (getline(fileInput, line))
-        if (!line.empty())
-        {
-            if (line.find("CREATE TABLE") == 0)
-            {
+    while (getline(fileInput, line)) {
+        if (line.empty()) continue;
+
+        try {
+            if (line.find("CREATE TABLE") == 0) {
                 create_table(line);
-            }
-            else if (line.find("DATABASE") == 0)
+            } else if (line.find("DATABASE") == 0)
             {
                 cout << "> " << line << endl;
                 outputFile << "> " << line << endl;
                 cout << fileInputName << endl;
                 outputFile << fileInputName << endl;
-            }
-            else if (line.find("CREATE") == 0)
-            {
+            } else if (line.find("CREATE") == 0) {
                 create_output_screen_and_file(line);
-            }
-            else if (line.find("TABLE") == 0)
+            } else if (line.find("TABLE") == 0)
             {
                 cout << "> " << line << endl;
                 outputFile << "> " << line << endl;
                 cout << tableName << endl;
                 outputFile << tableName << endl;
-            }
-            else if (line.find("INSERT INTO") == 0)
-            {
+            } else if (line.find("INSERT INTO") == 0) {
                 insert_into_table(line, table_Row);
-            }
-            else if (line.find("VALUES") != string::npos)
-            {
+            } else if (line.find("VALUES") != string::npos) {
                 cout << line << endl;
                 outputFile << line << endl;
                 create_database(line, customer);
-            }
-            else if (line.find("SELECT * FROM") == 0)
-            {
+            } else if (line.find("SELECT * FROM") == 0) {
                 select_all_from_table_in_csv_mode(customer);
+            } else {
+                cerr << "Warning: Unrecognized command - '" << line << "'" << endl;
             }
+        } catch (const exception &e) {
+            cerr << "Error: An exception occurred while processing the line: " << line << endl;
+            cerr << "Details: " << e.what() << endl;
         }
+    }
 
     fileInput.close();
-    outputFile.close();
+    if (outputFile.is_open()) {
+        outputFile.close();
+    }
 
     return 0;
 }
