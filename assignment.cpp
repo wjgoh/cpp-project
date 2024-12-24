@@ -5,14 +5,14 @@
 // Tutorial Class: TT4L
 // Trimester: 2430
 // Member_1: 242UC244S9 | GOH WEI JING | goh.wei.jing@student.mmu.edu.my | 011-10872022
-// Member_2: ID | NAME | EMAIL | PHONE
+// Member_2: 242UC244SJ | Khoo Shen Zhi | khoo.shen.zhi@student.mmu.edu.my | 011-36735033
 // Member_3: 242UC244K7 | CHIN KUAN SIING | CHIN.KUAN.SIING@student.mmu.edu.my |011-54070928
 // Member_4: 242UC244S3 | TENG MING HEIN | TENG.MING.HEIN@student.mmu.edu.my | 016-7831558
 //*******************************************************************************************
 // Task Distribution
 // Member_1: create_output_screen_and_file, create_table function, select_all_from_table_in_csv_mode
-// Member_2:
-// Member_3:create_insert_into_table,create_table function
+// Member_2: data manipulation, io heading
+// Member_3: create_insert_into_table,create_table function
 // Member_4: create_database function, create_table function
 //*******************************************************************************************
 #include <iostream>
