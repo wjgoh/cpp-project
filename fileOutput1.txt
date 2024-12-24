@@ -1,6 +1,6 @@
 > CREATE fileOutput1.txt;
 > DATABASES;
-C:\mariadb\fileInput1.mdb
+fileInput1.mdb
 > CREATE TABLE customer(
 customer_id INT,
 customer_name TEXT,

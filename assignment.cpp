@@ -4,13 +4,13 @@
 //Lecture Class: TC2L
 //Tutorial Class: TT4L
 //Trimester: 2430
-//Member_1: ID | NAME | EMAIL | PHONE
+//Member_1: 242UC244S9 | GOH WEI JING | goh.wei.jing@student.mmu.edu.my | 011-10872022
 //Member_2: ID | NAME | EMAIL | PHONE
 //Member_3: ID | NAME | EMAIL | PHONE
 //Member_4: 242UC244S3 | TENG MING HEIN | TENG.MING.HEIN@student.mmu.edu.my | 016-7831558
 //*******************************************************************************************
 //Task Distribution
-//Member_1:
+//Member_1: create_output_screen_and_file, create_table function, select_all_from_table_in_csv_mode
 //Member_2:
 //Member_3:
 //Member_4: create_database function, create_table function
@@ -21,6 +21,8 @@
 #include <string>
 #include <vector>
 using namespace std;
+
+string fileInputName = "fileInput1.mdb";// File name
 
 struct Information
 {
@@ -51,9 +53,9 @@ string tableName;
 
 void create_output_screen_and_file(const string &line)
 {
-    size_t file_begin = line.find(" ") + 1;                                 // Get the start position of output file name
-    size_t file_end = line.find(";");                                       // Get the end position of output file name
-    string outputFileName = line.substr(file_begin, file_end - file_begin); // Get the output file name
+    size_t file_begin = line.find(" ") + 1;                                 
+    size_t file_end = line.find(";");                                       
+    string outputFileName = line.substr(file_begin, file_end - file_begin); 
 
     outputFile.open(outputFileName);
 
@@ -183,7 +185,6 @@ int main()
     ifstream fileInput;
     string fileOutputName;
 
-    string fileInputName = "fileInput1.mdb";
 
     fileInput.open(fileInputName);
 
@@ -204,8 +205,8 @@ int main()
             else if (line.find("DATABASE") == 0) {
                 cout << "> " << line << endl;
                 outputFile << "> " << line << endl;
-                cout << "C:\\mariadb\\" << fileInputName << endl;
-                outputFile << "C:\\mariadb\\" << fileInputName << endl;
+                cout << fileInputName << endl;
+                outputFile << fileInputName << endl;
             }
             else if (line.find("CREATE") == 0) {
                 create_output_screen_and_file(line);
