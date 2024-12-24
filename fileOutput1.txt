@@ -1,4 +1,6 @@
 > CREATE fileOutput1.txt;
+> DATABASES;
+fileInput1.mdb
 > CREATE TABLE customer(
 customer_id INT,
 customer_name TEXT,
