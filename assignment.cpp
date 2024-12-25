@@ -23,7 +23,9 @@
 using namespace std;
 
 
-string fileInputName = "fileInput3.mdb"; // File name
+string fileInputName = "fileInput1.mdb"; // File name
+//string fileInputName = "fileInput2.mdb"; // File name
+//string fileInputName = "fileInput3.mdb"; // File name
 
 struct Information
 {
