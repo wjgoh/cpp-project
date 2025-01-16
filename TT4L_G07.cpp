@@ -11,7 +11,7 @@
 //*******************************************************************************************
 // Task Distribution
 // Member_1: create_output_screen_and_file, create_table function, select_all_from_table_in_csv_mode
-// Member_2: data manipulation, io heading, erro handling
+// Member_2: error_handling, flowchart, strecture diagram
 // Member_3: create_insert_into_table,create_table function
 // Member_4: create_database function, create_table function
 //*******************************************************************************************
