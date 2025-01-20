@@ -24,11 +24,12 @@
 using namespace std;
 
 
-string fileInputName = "fileInput1.mdb"; // File name
-//string fileInputName = "fileInput2.mdb"; // File name
-//string fileInputName = "fileInput3.mdb"; // File name
+//string fileInputName = "fileInput1.mdb";
+string fileInputName = "C:\\Users\\user\\CPP Assignment\\cpp-project\\fileInput1.mdb"; // with path name
+//string fileInputName = "fileInput2.mdb";
+//string fileInputName = "fileInput3.mdb";
 
-struct Information
+struct Information // wrong
 {
     int customer_id;
     string customer_name;
@@ -46,12 +47,12 @@ struct Row
 
 // function prototypes
 void create_output_screen_and_file(const string &line);
-void create_database(const string &line, vector<Information> &customer);
+void create_database(const string &line, vector<Information> &customer); // wrong, no dependent to one file input
 void create_table(const string &line);
 void insert_into_table(const string &line, vector<Row> &table_Row);
 void select_all_from_table_in_csv_mode(const vector<Information> &customer);
 
-// function definitions
+// function definitions, no global variables
 ofstream outputFile;
 bool headerPrinted = false;
 string tableName;
@@ -64,7 +65,7 @@ void create_output_screen_and_file(const string &line)
 
     outputFile.open(outputFileName);
 
-    if (!outputFile.is_open())
+    if ( !outputFile.is_open() )
     {
         cout << "Unable to create output file" << endl;
         return;
@@ -89,7 +90,7 @@ void create_database(const string &line, vector<Information> &customer)
         values.push_back(values_sep);
     }
 
-    Information customer_info;
+    Information customer_info; // wrong
     for (int i = 0; i < values.size(); i++)
     {
         if (values[i].find("'") != string::npos)
@@ -139,7 +140,7 @@ void create_table(const string &line)
     size_t tableName_end = line.find("(");
     tableName = line.substr(tableName_begin, tableName_end - tableName_begin); // Get table name
 
-    string headers[] = {
+    string headers[] = {  // wrong
         "customer_id INT,",
         "customer_name TEXT,",
         "customer_city TEXT,",
@@ -177,20 +178,20 @@ void insert_into_table(const string &line, vector<Row> &table_Row)
     outputFile << "> " << line << endl;
 }
 
-void select_all_from_table_in_csv_mode(const vector<Information> &customer)
+void select_all_from_table_in_csv_mode(const vector<Information> &customer) //wrong
 {
     cout << "> SELECT FROM * " << tableName << ";" << endl;
     outputFile << "> SELECT FROM * " << tableName << ";" << endl;
 
     if (!headerPrinted)
     {
-        // Print table header in CSV format
+        // Print table header in CSV format, wrong
         cout << "customer_id,customer_name,customer_city,customer_state,customer_country,customer_phone,customer_email\n";
         outputFile << "customer_id,customer_name,customer_city,customer_state,customer_country,customer_phone,customer_email\n";
         headerPrinted = true;
     }
 
-    // Print table data in CSV format
+    // Print table data in CSV view format, wrong
     for (const auto &c : customer)
     {
         cout << c.customer_id << "," << c.customer_name << "," << c.customer_city << "," << c.customer_state << "," << c.customer_country << "," << c.customer_phone << "," << c.customer_email << "\n";
@@ -225,7 +226,7 @@ int main()
         exit(-1);
     }
 
-    vector<Information> customer;
+    vector<Information> customer; // wrong
     vector<Row> table_Row;
 
     string line;
@@ -274,7 +275,7 @@ int main()
             }
         }
 
-    
+
 
     fileInput.close();
     if (outputFile.is_open()) {
