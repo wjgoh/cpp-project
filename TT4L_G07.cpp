@@ -20,6 +20,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <algorithm>
 using namespace std;
 
 
@@ -197,6 +198,20 @@ void select_all_from_table_in_csv_mode(const vector<Information> &customer)
     }
 }
 
+void delete_from_table(const string &line, vector<Information> &customer) {
+    size_t where_pos = line.find("WHERE");
+    size_t equals_pos = line.find("=", where_pos);
+    int customer_id = stoi(line.substr(equals_pos + 1));
+
+    customer.erase(remove_if(customer.begin(), customer.end(), [customer_id](const Information &c) {
+        return c.customer_id == customer_id;
+    }), customer.end());
+
+    cout << "> " << line << endl;
+    outputFile << "> " << line << endl;
+}
+
+
 int main()
 {
     vector<Information> customer;
@@ -215,35 +230,35 @@ int main()
 
     string line;
     while (getline(fileInput, line)) {
-        if (line.empty()) continue;
-
         try {
-            if (line.find("CREATE TABLE") == 0) {
-                create_table(line);
-            } else if (line.find("DATABASE") == 0)
-            {
-                cout << "> " << line << endl;
-                outputFile << "> " << line << endl;
-                cout << fileInputName << endl;
-                outputFile << fileInputName << endl;
-            } else if (line.find("CREATE") == 0) {
-                create_output_screen_and_file(line);
-            } else if (line.find("TABLE") == 0)
-            {
-                cout << "> " << line << endl;
-                outputFile << "> " << line << endl;
-                cout << tableName << endl;
-                outputFile << tableName << endl;
-            } else if (line.find("INSERT INTO") == 0) {
-                insert_into_table(line, table_Row);
-            } else if (line.find("VALUES") != string::npos) {
-                cout << line << endl;
-                outputFile << line << endl;
-                create_database(line, customer);
-            } else if (line.find("SELECT * FROM") == 0) {
-                select_all_from_table_in_csv_mode(customer);
-            } else {
-                cerr << "Warning: Unrecognized command - '" << line << "'" << endl;
+            if (!line.empty()) {
+                if (line.find("CREATE TABLE") == 0) {
+                    create_table(line);
+                } else if (line.find("DATABASE") == 0) {
+                    cout << "> " << line << endl;
+                    outputFile << "> " << line << endl;
+                    cout << fileInputName << endl;
+                    outputFile << fileInputName << endl;
+                } else if (line.find("CREATE") == 0) {
+                    create_output_screen_and_file(line);
+                } else if (line.find("TABLE") == 0) {
+                    cout << "> " << line << endl;
+                    outputFile << "> " << line << endl;
+                    cout << tableName << endl;
+                    outputFile << tableName << endl;
+                } else if (line.find("INSERT INTO") == 0) {
+                    insert_into_table(line, table_Row);
+                } else if (line.find("VALUES") != string::npos) {
+                    cout << line << endl;
+                    outputFile << line << endl;
+                    create_database(line, customer);
+                } else if (line.find("SELECT * FROM") == 0) {
+                    select_all_from_table_in_csv_mode(customer);
+                } else if (line.find("DELETE FROM") == 0) {
+                    delete_from_table(line, customer);
+                } else {
+                    cerr << "Warning: Unrecognized command - '" << line << "'" << endl;
+                }
             }
         } catch (const exception &e) {
             cerr << "Error: An exception occurred while processing the line: " << line << endl;
