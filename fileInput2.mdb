@@ -22,3 +22,9 @@ INSERT INTO
 customer(customer_id,customer_name,customer_city,customer_state,customer_country,customer_phone,customer_email) VALUES (124,'Bryan Leong','Bandar Utama','Selangor','Malaysia','0134567892','bryan@gmail.com');
 
 SELECT * FROM customer;
+
+TABLES;
+
+DELETE FROM customer WHERE customer_id=12; SELECT * FROM customer;
+
+SELECT * FROM customer;

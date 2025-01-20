@@ -26,3 +26,10 @@ customer_id,customer_name,customer_city,customer_state,customer_country,customer
 52,Farhan Hassan,Kota Bharu,Kelantan,Malaysia,019-9876543,farhan_hassan@yahoo.com
 36,Chong,George Town,Penang,Malaysia,017-2345678,chong54@hotmail.com
 75,Zahid Rahman,Ipoh,Perak,Malaysia,013-9871234,zahid.rahman@gmail.com
+> TABLES;
+customer
+> DELETE FROM customer WHERE customer_id=36; SELECT * FROM customer;
+> SELECT FROM * customer;
+13,Aina Yusof,Alor Setar,Kedah,Malaysia,012-1234567,aina123@gmail.com
+52,Farhan Hassan,Kota Bharu,Kelantan,Malaysia,019-9876543,farhan_hassan@yahoo.com
+75,Zahid Rahman,Ipoh,Perak,Malaysia,013-9871234,zahid.rahman@gmail.com
