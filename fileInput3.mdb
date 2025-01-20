@@ -1,0 +1,24 @@
+CREATE fileOutput3.txt;
+DATABASES;
+
+CREATE TABLE customer(
+customer_id INT,
+customer_name TEXT,
+customer_city TEXT,
+customer_state TEXT,
+customer_country TEXT,
+customer_phone TEXT,
+customer_email TEXT
+);
+TABLES;
+
+INSERT INTO 
+customer(customer_id,customer_name,customer_city,customer_state,customer_country,customer_phone,customer_email) VALUES (13,'Aina Yusof','Alor Setar','Kedah','Malaysia','012-1234567','aina123@gmail.com');
+INSERT INTO 
+customer(customer_id,customer_name,customer_city,customer_state,customer_country,customer_phone,customer_email) VALUES (52,'Farhan Hassan','Kota Bharu','Kelantan','Malaysia','019-9876543','farhan_hassan@yahoo.com');
+INSERT INTO 
+customer(customer_id,customer_name,customer_city,customer_state,customer_country,customer_phone,customer_email) VALUES (36,'Chong','George Town','Penang','Malaysia','017-2345678','chong54@hotmail.com');
+INSERT INTO 
+customer(customer_id,customer_name,customer_city,customer_state,customer_country,customer_phone,customer_email) VALUES (75,'Zahid Rahman','Ipoh','Perak','Malaysia','013-9871234','zahid.rahman@gmail.com');
+
+SELECT * FROM customer;

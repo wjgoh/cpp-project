@@ -5,14 +5,14 @@
 // Tutorial Class: TT4L
 // Trimester: 2430
 // Member_1: 242UC244S9 | GOH WEI JING | goh.wei.jing@student.mmu.edu.my | 011-10872022
-// Member_2: ID | NAME | EMAIL | PHONE
+// Member_2: 242UC244SJ | Khoo Shen Zhi | khoo.shen.zhi@student.mmu.edu.my | 011-36735033
 // Member_3: 242UC244K7 | CHIN KUAN SIING | CHIN.KUAN.SIING@student.mmu.edu.my |011-54070928
 // Member_4: 242UC244S3 | TENG MING HEIN | TENG.MING.HEIN@student.mmu.edu.my | 016-7831558
 //*******************************************************************************************
 // Task Distribution
 // Member_1: create_output_screen_and_file, create_table function, select_all_from_table_in_csv_mode
-// Member_2:
-// Member_3:create_insert_into_table,create_table function
+// Member_2: data manipulation, io heading, erro handling
+// Member_3: create_insert_into_table,create_table function
 // Member_4: create_database function, create_table function
 //*******************************************************************************************
 #include <iostream>
@@ -22,7 +22,10 @@
 #include <vector>
 using namespace std;
 
+
 string fileInputName = "fileInput1.mdb"; // File name
+//string fileInputName = "fileInput2.mdb"; // File name
+//string fileInputName = "fileInput3.mdb"; // File name
 
 struct Information
 {
@@ -196,6 +199,9 @@ void select_all_from_table_in_csv_mode(const vector<Information> &customer)
 
 int main()
 {
+    vector<Information> customer;
+    vector<Row> table_Row;
+
     ifstream fileInput;
     string fileOutputName;
 
@@ -207,53 +213,48 @@ int main()
         exit(-1);
     }
 
-    vector<Information> customer;
-    vector<Row> table_Row;
-
     string line;
-    while (getline(fileInput, line))
-        if (!line.empty())
-        {
-            if (line.find("CREATE TABLE") == 0)
-            {
+    while (getline(fileInput, line)) {
+        if (line.empty()) continue;
+
+        try {
+            if (line.find("CREATE TABLE") == 0) {
                 create_table(line);
-            }
-            else if (line.find("DATABASE") == 0)
+            } else if (line.find("DATABASE") == 0)
             {
                 cout << "> " << line << endl;
                 outputFile << "> " << line << endl;
                 cout << fileInputName << endl;
                 outputFile << fileInputName << endl;
-            }
-            else if (line.find("CREATE") == 0)
-            {
+            } else if (line.find("CREATE") == 0) {
                 create_output_screen_and_file(line);
-            }
-            else if (line.find("TABLE") == 0)
+            } else if (line.find("TABLE") == 0)
             {
                 cout << "> " << line << endl;
                 outputFile << "> " << line << endl;
                 cout << tableName << endl;
                 outputFile << tableName << endl;
-            }
-            else if (line.find("INSERT INTO") == 0)
-            {
+            } else if (line.find("INSERT INTO") == 0) {
                 insert_into_table(line, table_Row);
-            }
-            else if (line.find("VALUES") != string::npos)
-            {
+            } else if (line.find("VALUES") != string::npos) {
                 cout << line << endl;
                 outputFile << line << endl;
                 create_database(line, customer);
-            }
-            else if (line.find("SELECT * FROM") == 0)
-            {
+            } else if (line.find("SELECT * FROM") == 0) {
                 select_all_from_table_in_csv_mode(customer);
+            } else {
+                cerr << "Warning: Unrecognized command - '" << line << "'" << endl;
             }
+        } catch (const exception &e) {
+            cerr << "Error: An exception occurred while processing the line: " << line << endl;
+            cerr << "Details: " << e.what() << endl;
         }
+    }
 
     fileInput.close();
-    outputFile.close();
+    if (outputFile.is_open()) {
+        outputFile.close();
+    }
 
     return 0;
 }
