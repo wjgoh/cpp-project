@@ -29,17 +29,6 @@ string fileInputName = "C:\\Users\\user\\CPP Assignment\\cpp-project\\fileInput1
 //string fileInputName = "fileInput2.mdb";
 //string fileInputName = "fileInput3.mdb";
 
-struct Information // wrong
-{
-    int customer_id;
-    string customer_name;
-    string customer_city;
-    string customer_state;
-    string customer_country;
-    string customer_phone;
-    string customer_email;
-};
-
 struct Row
 {
     int num_Row;
@@ -47,15 +36,14 @@ struct Row
 
 // function prototypes
 void create_output_screen_and_file(const string &line);
-void create_database(const string &line, vector<Information> &customer); // wrong, no dependent to one file input
-void create_table(const string &line);
+void create_database(const string line, vector<vector<string>> &rows_data); // fixed
+void create_table(const vector<string> column_lines, string &tableName, vector<string> &table_Column, vector<string> &data_type);
 void insert_into_table(const string &line, vector<Row> &table_Row);
 void select_all_from_table_in_csv_mode(const vector<Information> &customer);
 
 // function definitions, no global variables
 ofstream outputFile;
 bool headerPrinted = false;
-string tableName;
 
 void create_output_screen_and_file(const string &line)
 {
@@ -75,10 +63,9 @@ void create_output_screen_and_file(const string &line)
     outputFile << "> CREATE " << outputFileName << ";" << endl;
 }
 
-void create_database(const string &line, vector<Information> &customer)
+void create_database(const string line, vector<vector<string>> &rows_data)
 {
     size_t values_pos = line.find("VALUES");
-
     string values_eli = line.substr(values_pos);                                                                       // To remove the word "VALUES"
     string values_line = values_eli.substr(values_eli.find("(") + 1, values_eli.find(")") - values_eli.find("(") - 1); // To remove the parenthesis()
 
@@ -90,81 +77,48 @@ void create_database(const string &line, vector<Information> &customer)
         values.push_back(values_sep);
     }
 
-    Information customer_info; // wrong
+    vector<string> rows_values;
     for (int i = 0; i < values.size(); i++)
     {
         if (values[i].find("'") != string::npos)
         {
             values[i] = values[i].substr(1, values[i].size() - 2); // To eliminate the single quote(')
-            if (i == 1)
-            {
-                customer_info.customer_name = values[i]; // To collect the string data
-            }
-            else if (i == 2)
-            {
-                customer_info.customer_city = values[i];
-            }
-            else if (i == 3)
-            {
-                customer_info.customer_state = values[i];
-            }
-            else if (i == 4)
-            {
-                customer_info.customer_country = values[i];
-            }
-            else if (i == 5)
-            {
-                customer_info.customer_phone = values[i];
-            }
-            else if (i == 6)
-            {
-                customer_info.customer_email = values[i];
-            }
+            rows_values.push_back(values[i]);
         }
         else
         {
-            int number = stoi(values[i]); // To convert string to integer
-            if (i == 0)
-            {
-                customer_info.customer_id = number; // To collect the integer data
-            }
+            rows_values.push_back(values[i]);
         }
     }
-
-    customer.push_back(customer_info); // Update the vector structure
+    rows_data.push_back(rows_values); // Update the vector structure
 }
 
-void create_table(const string &line)
+void create_table(const vector<string> column_lines, string &tableName, vector<string> &table_Column, vector<string> &data_type)
 {
-    size_t tableName_begin = line.find("TABLE") + 6;
-    size_t tableName_end = line.find("(");
-    tableName = line.substr(tableName_begin, tableName_end - tableName_begin); // Get table name
-
-    string headers[] = {  // wrong
-        "customer_id INT,",
-        "customer_name TEXT,",
-        "customer_city TEXT,",
-        "customer_state TEXT,",
-        "customer_country TEXT,",
-        "customer_phone TEXT,",
-        "customer_email TEXT",
-    };
-
-    // Initialize table row and column
-    const int table_Col = sizeof(headers) / sizeof(headers[0]); // Number of columns
-
-    cout << "> CREATE TABLE " << tableName << "(" << endl;
-    outputFile << "> CREATE TABLE " << tableName << "(" << endl;
-
-    // Print column names
-    for (int i = 0; i < table_Col; i++)
+    for (const string& command : column_lines)
     {
-        cout << headers[i] << endl;
-        outputFile << headers[i] << endl;
-    }
+        string line = command;
 
-    cout << ");" << endl;
-    outputFile << ");" << endl;
+        if (line.find("CREATE TABLE") != string::npos)
+        {
+            // Get the table name
+            size_t tableName_begin = line.find("TABLE") + 6;
+            size_t tableName_end = line.find("(");
+            tableName = line.substr(tableName_begin, tableName_end - tableName_begin);
+        }
+        else if (line.find("INT") != string::npos || line.find("TEXT") != string::npos)
+        {
+            // Get the column name
+            size_t blank = line.find(' ');
+            string col_name = line.substr(0, blank);
+            table_Column.push_back(col_name);
+
+            // Get the data type
+            size_t comma_pos = line.find(",");
+            string dtName = line.substr(blank + 1, comma_pos - blank - 1);
+            data_type.push_back(dtName);
+        }
+    }
 }
 
 void insert_into_table(const string &line, vector<Row> &table_Row)
@@ -226,8 +180,11 @@ int main()
         exit(-1);
     }
 
-    vector<Information> customer; // wrong
+    vector<vector<string>> &rows_data; // fixed
+    vector<string> data_type;
+    vector<string> table_Column;
     vector<Row> table_Row;
+    string tableName;
 
     string line;
     while (getline(fileInput, line))
@@ -235,7 +192,23 @@ int main()
         {
             if (line.find("CREATE TABLE") == 0)
             {
-                create_table(line);
+                cout << "> " << line << endl;
+                vector<string> column_lines;
+
+                column_lines.push_back(line); // Add the "CREATE TABLE" line
+                string command;
+                while (getline(fileInput, command) && command.find(");") == string::npos)
+                {
+                    column_lines.push_back(command);
+                    cout << command << endl;
+                    outputFile << command << endl;
+                }
+                column_lines.push_back(command); // Add the final line with ");"
+
+                cout << command << endl; // Print the final line
+                outputFile << command << endl;
+
+                create_table(column_lines, tableName, table_Column, data_type);
             }
             else if (line.find("DATABASE") == 0)
             {
@@ -263,7 +236,7 @@ int main()
             {
                 cout << line << endl;
                 outputFile << line << endl;
-                create_database(line, customer);
+                create_database(line, rows_data);
             }
             else if (line.find("SELECT * FROM") == 0)
             {
