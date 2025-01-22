@@ -1,6 +1,6 @@
 > CREATE output1.txt;
 > DATABASES;	
-C:\Users\user\OneDrive\Desktop\University\Bachelor of CS\Trimester 2\C Programming Fundamentals\Assignment\data_input1.mdb
+C:\Users\user\CPP Assignment\cpp-project\fileInput1.mdb
 customer_id INT,
 customer_name TEXT,
 customer_city TEXT,
@@ -9,8 +9,6 @@ customer_country TEXT,
 customer_phone TEXT,
 customer_email TEXT
 );
-> TABLES;
-customer
 > INSERT INTO
 customer(customer_id,customer_name,customer_city,customer_state,customer_country,customer_phone,customer_email) VALUES (g,'name1','city1','state1','country1','phone1','email1');
 > INSERT INTO
