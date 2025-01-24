@@ -139,8 +139,22 @@ void select_all_from_table_in_csv_mode(const string &line, const string &tableNa
     size_t tableName_end = line.find(";", tableName_begin);
     string check_tableName = line.substr(tableName_begin, tableName_end - tableName_begin);
 
+    
     if (check_tableName == tableName)
     {
+
+        for (size_t i = 0; i < table_Column.size(); ++i)
+        {
+            cout << table_Column[i];
+            outputFile << table_Column[i];
+            if (i < table_Column.size() - 1)
+            {
+                cout << ",";
+                outputFile << ",";
+            }
+        }
+        cout << endl;
+        outputFile << endl;
         for (const auto &row : rows_data)
         {
             for (size_t i = 0; i < row.size(); ++i)
@@ -156,6 +170,7 @@ void select_all_from_table_in_csv_mode(const string &line, const string &tableNa
             cout << endl;
             outputFile << endl;
         }
+        
     }
 }
 
@@ -233,7 +248,7 @@ int main()
 {
 
     //string fileInputName = "fileInput1.mdb";
-    string fileInputName = "fileInput2.mdb"; // with path name
+    string fileInputName = "fileInput1.mdb"; // with path name
     //string fileInputName = "fileInput2.mdb";
     //string fileInputName = "fileInput3.mdb";
 

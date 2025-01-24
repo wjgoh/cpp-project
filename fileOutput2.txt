@@ -21,6 +21,7 @@ customer(customer_id,customer_name,customer_city,customer_state,customer_country
 > INSERT INTO 
 customer(customer_id,customer_name,customer_city,customer_state,customer_country,customer_phone,customer_email) VALUES (124,'Bryan Leong','Bandar Utama','Selangor','Malaysia','0134567892','bryan@gmail.com');
 > SELECT * FROM customer;
+customer_id,customer_name,customer_city,customer_state,customer_country,customer_phone,customer_email
 1,Tan,Johor Bahru,Johor,Malaysia,012-3456789,tan24@gmail.com
 12,Winnie Ng,Kuantan,Pahang,Malaysia,011-1122334,ng@yahoo.com
 123,Adam,Cyberjaya,Selangor,Malaysia,0165432198,adam01@yahoo.com
@@ -29,6 +30,7 @@ customer(customer_id,customer_name,customer_city,customer_state,customer_country
 customer
 > DELETE FROM customer WHERE customer_id=12; 
 > SELECT * FROM customer;
+customer_id,customer_name,customer_city,customer_state,customer_country,customer_phone,customer_email
 1,Tan,Johor Bahru,Johor,Malaysia,012-3456789,tan24@gmail.com
 123,Adam,Cyberjaya,Selangor,Malaysia,0165432198,adam01@yahoo.com
 124,Bryan Leong,Bandar Utama,Selangor,Malaysia,0134567892,bryan@gmail.com
