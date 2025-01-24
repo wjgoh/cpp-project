@@ -25,7 +25,7 @@ using namespace std;
 
 
 //string fileInputName = "fileInput1.mdb";
-string fileInputName = "C:\\Users\\user\\CPP Assignment\\cpp-project\\fileInput1.mdb"; // with path name
+string fileInputName = "fileInput1.mdb"; // with path name
 //string fileInputName = "fileInput2.mdb";
 //string fileInputName = "fileInput3.mdb";
 
@@ -39,7 +39,8 @@ void create_output_screen_and_file(const string &line);
 void create_database(const string line, vector<vector<string>> &rows_data); // fixed
 void create_table(const vector<string> column_lines, string &tableName, vector<string> &table_Column, vector<string> &data_type);
 void insert_into_table(const string &line, vector<Row> &table_Row);
-void select_all_from_table_in_csv_mode(const vector<Information> &customer);
+void select_all_from_table_in_csv_mode(const string &line, const string &tableName, const vector<string> &table_Column, const vector<vector<string>> &rows_data, ofstream &outputFile);
+void delete_from_table(const string &line, const string &tableName, const vector<string> &table_Column, vector<vector<string>> &rows_data, ofstream &outputFile);
 void count_tableRow(const vector<vector<string>> &rows_data);
 
 // function definitions, no global variables
@@ -133,44 +134,101 @@ void insert_into_table(const string &line, vector<Row> &table_Row)
     outputFile << "> " << line << endl;
 }
 
-void select_all_from_table_in_csv_mode(const vector<Information> &customer) //wrong
+void select_all_from_table_in_csv_mode(const string &line, const string &tableName, const vector<string> &table_Column, const vector<vector<string>> &rows_data, ofstream &outputFile)
 {
-    cout << "> SELECT FROM * " << tableName << ";" << endl;
-    outputFile << "> SELECT FROM * " << tableName << ";" << endl;
+    size_t tableName_begin = line.find("FROM") + 5;
+    size_t tableName_end = line.find(";", tableName_begin);
+    string check_tableName = line.substr(tableName_begin, tableName_end - tableName_begin);
 
-    if (!headerPrinted)
+    if (check_tableName == tableName)
     {
-        // Print table header in CSV format, wrong
-        cout << "customer_id,customer_name,customer_city,customer_state,customer_country,customer_phone,customer_email\n";
-        outputFile << "customer_id,customer_name,customer_city,customer_state,customer_country,customer_phone,customer_email\n";
-        headerPrinted = true;
-    }
-
-    // Print table data in CSV view format, wrong
-    for (const auto &c : customer)
-    {
-        cout << c.customer_id << "," << c.customer_name << "," << c.customer_city << "," << c.customer_state << "," << c.customer_country << "," << c.customer_phone << "," << c.customer_email << "\n";
-        outputFile << c.customer_id << "," << c.customer_name << "," << c.customer_city << "," << c.customer_state << "," << c.customer_country << "," << c.customer_phone << "," << c.customer_email << "\n";
+        for (const auto &row : rows_data)
+        {
+            for (size_t i = 0; i < row.size(); ++i)
+            {
+                cout << row[i];
+                outputFile << row[i];
+                if (i < row.size() - 1)
+                {
+                    cout << ",";
+                    outputFile << ",";
+                }
+            }
+            cout << endl;
+            outputFile << endl;
+        }
     }
 }
 
-void delete_from_table(const string &line, vector<Information> &customer) {
-    size_t where_pos = line.find("WHERE");
-    size_t equals_pos = line.find("=", where_pos);
-    int customer_id = stoi(line.substr(equals_pos + 1));
+void delete_from_table(const string &line, const string &tableName, const vector<string> &table_Column, vector<vector<string>> &rows_data, ofstream &outputFile)
+{
+    size_t tableName_begin = line.find("FROM") + 5;
+    size_t tableName_end = line.find(" ", tableName_begin);
+    if (tableName_end == string::npos) {
+        tableName_end = line.find(";", tableName_begin);
+    }
+    if (tableName_end == string::npos) {
+        cerr << "Error: Invalid query format." << endl;
+        return;
+    }
+    string check_tableName = line.substr(tableName_begin, tableName_end - tableName_begin);
 
-    customer.erase(remove_if(customer.begin(), customer.end(), [customer_id](const Information &c) {
-        return c.customer_id == customer_id;
-    }), customer.end());
+    if (check_tableName == tableName)
+    {
+        size_t where_pos = line.find("WHERE");
+        if (where_pos != string::npos) {
+            string condition = line.substr(where_pos + 6);
+            size_t equal_pos = condition.find("=");
+            if (equal_pos != string::npos) {
+                string column = condition.substr(0, equal_pos);
+                string value = condition.substr(equal_pos + 1);
 
-    cout << "> " << line << endl;
-    outputFile << "> " << line << endl;
+                // Trim spaces and semicolon
+                column.erase(remove_if(column.begin(), column.end(), ::isspace), column.end());
+                value.erase(remove_if(value.begin(), value.end(), ::isspace), value.end());
+                size_t semicolon_pos = value.find(";");
+                if (semicolon_pos != string::npos) {
+                    value = value.substr(0, semicolon_pos);
+                }
+
+                // Find the column index
+                auto it = find(table_Column.begin(), table_Column.end(), column);
+                if (it != table_Column.end()) {
+                    int col_index = distance(table_Column.begin(), it);
+
+                    // Find and delete the row
+                    auto row_it = find_if(rows_data.begin(), rows_data.end(), [&](const vector<string>& row) {
+                        return row[col_index] == value;
+                    });
+
+                    if (row_it != rows_data.end()) {
+                        rows_data.erase(row_it);
+                    }
+                } else {
+                    cerr << "Error: Column not found." << endl;
+                }
+            } else {
+                cerr << "Error: Invalid condition format." << endl;
+            }
+        } else {
+            cerr << "Error: WHERE clause not found." << endl;
+        }
+        cout << "> " << line << endl;
+        outputFile << "> " << line << endl;
+    }
+    else
+    {
+        cerr << "Error: Table name does not match." << endl;
+    }
 }
 
-void count_tableRow(const vector<vector<string>> &rows_data);
+void count_tableRow(const vector<vector<string>> &rows_data, ofstream &outputFile)
 {
     cout << rows_data.size() << endl;
+    outputFile << rows_data.size() << endl;
 }
+
+
 
 int main()
 {
@@ -185,7 +243,7 @@ int main()
         exit(-1);
     }
 
-    vector<vector<string>> &rows_data; // fixed
+    vector<vector<string>> rows_data;
     vector<string> data_type;
     vector<string> table_Column;
     vector<Row> table_Row;
@@ -245,11 +303,17 @@ int main()
             }
             else if (line.find("SELECT * FROM") == 0)
             {
-                select_all_from_table_in_csv_mode(customer);
+                select_all_from_table_in_csv_mode(line, tableName, table_Column, rows_data, outputFile);
             }
             else if (line.find("DELETE FROM") == 0)
             {
-                delete_from_table(line, customer);
+                delete_from_table(line, tableName, table_Column, rows_data, outputFile);
+            }
+            else if (line.find("SELECT COUNT(*) FROM") == 0)
+            {
+                cout << "> " << line << endl;
+                outputFile << "> " << line << endl;
+                count_tableRow(rows_data, outputFile);
             }
         }
 
