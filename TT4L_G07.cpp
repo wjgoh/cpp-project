@@ -176,63 +176,44 @@ void select_all_from_table_in_csv_mode(const string &line, const string &tableNa
 
 void delete_from_table(const string &line, const string &tableName, const vector<string> &table_Column, vector<vector<string>> &rows_data, ofstream &outputFile)
 {
-    size_t tableName_begin = line.find("FROM") + 5;
-    size_t tableName_end = line.find(" ", tableName_begin);
-    if (tableName_end == string::npos) {
-        tableName_end = line.find(";", tableName_begin);
-    }
-    if (tableName_end == string::npos) {
-        cerr << "Error: Invalid query format." << endl;
-        return;
-    }
-    string check_tableName = line.substr(tableName_begin, tableName_end - tableName_begin);
+   size_t tableName_begin = line.find("FROM") + 5;
+    size_t tableName_end = line.find("WHERE");
+    string check_tableName = line.substr(tableName_begin, tableName_end - 1 - tableName_begin);
 
     if (check_tableName == tableName)
     {
-        size_t where_pos = line.find("WHERE");
-        if (where_pos != string::npos) {
-            string condition = line.substr(where_pos + 6);
-            size_t equal_pos = condition.find("=");
-            if (equal_pos != string::npos) {
-                string column = condition.substr(0, equal_pos);
-                string value = condition.substr(equal_pos + 1);
-
-                // Trim spaces and semicolon
-                column.erase(remove_if(column.begin(), column.end(), ::isspace), column.end());
-                value.erase(remove_if(value.begin(), value.end(), ::isspace), value.end());
-                size_t semicolon_pos = value.find(";");
-                if (semicolon_pos != string::npos) {
-                    value = value.substr(0, semicolon_pos);
-                }
-
-                // Find the column index
-                auto it = find(table_Column.begin(), table_Column.end(), column);
-                if (it != table_Column.end()) {
-                    int col_index = distance(table_Column.begin(), it);
-
-                    // Find and delete the row
-                    auto row_it = find_if(rows_data.begin(), rows_data.end(), [&](const vector<string>& row) {
-                        return row[col_index] == value;
-                    });
-
-                    if (row_it != rows_data.end()) {
-                        rows_data.erase(row_it);
-                    }
-                } else {
-                    cerr << "Error: Column not found." << endl;
-                }
-            } else {
-                cerr << "Error: Invalid condition format." << endl;
-            }
-        } else {
-            cerr << "Error: WHERE clause not found." << endl;
-        }
-        cout << "> " << line << endl;
+        cout << "> "<< line << endl;
         outputFile << "> " << line << endl;
+
+        size_t where_pos = line.find("WHERE");
+        string where_command = line.substr(where_pos + 6, line.find(";") - (where_pos + 6));
+        //cout << where_command << endl;
+
+        size_t where_equal_pos = where_command.find("=");
+        string where_col = where_command.substr(0, where_equal_pos);
+        string where_data = where_command.substr(where_equal_pos + 1);
+        //cout << where_col << endl << where_data << endl;
+
+        int where_col_index;
+        int where_data_index;
+        for (int i = 0; i < table_Column.size(); i++)
+        {
+            if(where_col == table_Column[i])
+                where_col_index = i;
+                break;
+        }
+
+        vector<vector<string>> update_row;
+        for (int i = 0; i < rows_data.size(); i++)
+        {
+            if (rows_data[i][where_col_index] != where_data)
+                update_row.push_back(rows_data[i]);
+        }
+        rows_data = update_row;
     }
     else
     {
-        cerr << "Error: Table name does not match." << endl;
+        cerr << "Warning - table not found!!" << endl;
     }
 }
 
