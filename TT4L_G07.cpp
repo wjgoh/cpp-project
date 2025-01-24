@@ -170,6 +170,7 @@ void delete_from_table(const string &line, vector<Information> &customer) {
 void count_tableRow(const vector<vector<string>> &rows_data);
 {
     cout << rows_data.size() << endl;
+    outputFile<<rows_data.size()<<endl;
 }
 
 int main()
