@@ -24,15 +24,12 @@
 using namespace std;
 
 
-//string fileInputName = "fileInput1.mdb";
-string fileInputName = "fileInput1.mdb"; // with path name
-//string fileInputName = "fileInput2.mdb";
-//string fileInputName = "fileInput3.mdb";
 
 struct Row
 {
     int num_Row;
 };
+
 
 // function prototypes
 void create_output_screen_and_file(const string &line);
@@ -46,6 +43,8 @@ void count_tableRow(const vector<vector<string>> &rows_data);
 // function definitions, no global variables
 ofstream outputFile;
 bool headerPrinted = false;
+
+
 
 void create_output_screen_and_file(const string &line)
 {
@@ -232,6 +231,12 @@ void count_tableRow(const vector<vector<string>> &rows_data, ofstream &outputFil
 
 int main()
 {
+
+    //string fileInputName = "fileInput1.mdb";
+    string fileInputName = "fileInput2.mdb"; // with path name
+    //string fileInputName = "fileInput2.mdb";
+    //string fileInputName = "fileInput3.mdb";
+
     ifstream fileInput;
     string fileOutputName;
 
@@ -256,6 +261,7 @@ int main()
             if (line.find("CREATE TABLE") == 0)
             {
                 cout << "> " << line << endl;
+                outputFile << "> " << line << endl;
                 vector<string> column_lines;
 
                 column_lines.push_back(line); // Add the "CREATE TABLE" line
@@ -303,6 +309,8 @@ int main()
             }
             else if (line.find("SELECT * FROM") == 0)
             {
+                cout << "> " << line << endl;
+                outputFile << "> " << line << endl;
                 select_all_from_table_in_csv_mode(line, tableName, table_Column, rows_data, outputFile);
             }
             else if (line.find("DELETE FROM") == 0)
