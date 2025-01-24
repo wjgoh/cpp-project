@@ -21,21 +21,14 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <cctype>
 using namespace std;
-
-
-
-struct Row
-{
-    int num_Row;
-};
-
 
 // function prototypes
 void create_output_screen_and_file(const string &line);
-void create_database(const string line, vector<vector<string>> &rows_data); // fixed
+void create_database(const string line, vector<vector<string>> &temporary_data, vector<vector<string>> &rows_data); // fixed
 void create_table(const vector<string> column_lines, string &tableName, vector<string> &table_Column, vector<string> &data_type);
-void insert_into_table(const string &line, vector<Row> &table_Row);
+void insert_into_table(const string &line, const string tableName, const vector<vector<string>> temporary_data, const vector<string> data_type, ofstream &outputFile);
 void select_all_from_table_in_csv_mode(const string &line, const string &tableName, const vector<string> &table_Column, const vector<vector<string>> &rows_data, ofstream &outputFile);
 void delete_from_table(const string &line, const string &tableName, const vector<string> &table_Column, vector<vector<string>> &rows_data, ofstream &outputFile);
 void count_tableRow(const vector<vector<string>> &rows_data);
@@ -64,7 +57,7 @@ void create_output_screen_and_file(const string &line)
     outputFile << "> CREATE " << outputFileName << ";" << endl;
 }
 
-void create_database(const string line, vector<vector<string>> &rows_data)
+void create_database(const string line, vector<vector<string>> &temporary_data, vector<vector<string>> &rows_data)
 {
     size_t values_pos = line.find("VALUES");
     string values_eli = line.substr(values_pos);                                                                       // To remove the word "VALUES"
@@ -77,6 +70,7 @@ void create_database(const string line, vector<vector<string>> &rows_data)
     { // To separate a comma(,) between the data
         values.push_back(values_sep);
     }
+    temporary_data.push_back(values);
 
     vector<string> rows_values;
     for (int i = 0; i < values.size(); i++)
@@ -91,7 +85,7 @@ void create_database(const string line, vector<vector<string>> &rows_data)
             rows_values.push_back(values[i]);
         }
     }
-    rows_data.push_back(rows_values); // Update the vector structure
+    rows_data.push_back(rows_values); // Update vector rows_data
 }
 
 void create_table(const vector<string> column_lines, string &tableName, vector<string> &table_Column, vector<string> &data_type)
@@ -122,15 +116,40 @@ void create_table(const vector<string> column_lines, string &tableName, vector<s
     }
 }
 
-void insert_into_table(const string &line, vector<Row> &table_Row)
+void insert_into_table(const string &line, const string tableName, const vector<vector<string>> temporary_data, const vector<string> data_type, ofstream &outputFile)
 {
-    Row row;
-    row.num_Row = table_Row.size() + 1; // Update the table row while "INSERT INTO" is found
-    table_Row.push_back(row);
+    size_t tableName_end = line.find("(");
+    string check_tableName = line.substr(0, tableName_end);
 
-    // Output for confirmation
-    cout << "> " << line << endl;
-    outputFile << "> " << line << endl;
+    if (check_tableName == tableName) // Verify table name
+    {
+        for (int i = 0; i < temporary_data.size(); i++)
+        {
+            for (int j = 0; j < temporary_data[i].size(); j++)
+            {
+                if (data_type[j] == "INT") // If table column is an INT data type
+                {
+                    for (char ch : temporary_data[i][j])
+                    {
+                        if ( !isdigit(ch) || temporary_data[i][j].find("'") != string::npos ) // Check if the data is not a digit or numeric data
+                        {
+                            cerr << "Warning - " << temporary_data[i][j] << " not match with the data type INT!!" << endl;
+                            break;
+                        }
+                    }
+                }
+                else if (data_type[j] == "TEXT") // If table column is a TEXT data type
+                {
+                    if (temporary_data[i][j].find("'") == string::npos) // Check if the data is not a string
+                        cerr << "Warning - " << temporary_data[i][j] << " not match with the data type TEXT!!" << endl;
+                }
+            }
+        }
+    }
+    else
+    {
+        cerr << "Warning - table " << check_tableName << " not found!!" << endl;
+    }
 }
 
 void select_all_from_table_in_csv_mode(const string &line, const string &tableName, const vector<string> &table_Column, const vector<vector<string>> &rows_data, ofstream &outputFile)
@@ -139,7 +158,7 @@ void select_all_from_table_in_csv_mode(const string &line, const string &tableNa
     size_t tableName_end = line.find(";", tableName_begin);
     string check_tableName = line.substr(tableName_begin, tableName_end - tableName_begin);
 
-    
+
     if (check_tableName == tableName)
     {
 
@@ -170,13 +189,13 @@ void select_all_from_table_in_csv_mode(const string &line, const string &tableNa
             cout << endl;
             outputFile << endl;
         }
-        
+
     }
 }
 
 void delete_from_table(const string &line, const string &tableName, const vector<string> &table_Column, vector<vector<string>> &rows_data, ofstream &outputFile)
 {
-   size_t tableName_begin = line.find("FROM") + 5;
+    size_t tableName_begin = line.find("FROM") + 5;
     size_t tableName_end = line.find("WHERE");
     string check_tableName = line.substr(tableName_begin, tableName_end - 1 - tableName_begin);
 
@@ -245,9 +264,9 @@ int main()
     }
 
     vector<vector<string>> rows_data;
+    vector<vector<string>> temporary_data;
     vector<string> data_type;
     vector<string> table_Column;
-    vector<Row> table_Row;
     string tableName;
 
     string line;
@@ -295,13 +314,15 @@ int main()
             }
             else if (line.find("INSERT INTO") == 0)
             {
-                insert_into_table(line, table_Row);
+                cout << "> " << line << endl;
+                outputFile << "> " << line << endl;
             }
             else if (line.find("VALUES") != string::npos)
             {
                 cout << line << endl;
                 outputFile << line << endl;
-                create_database(line, rows_data);
+                create_database(line, temporary_data, rows_data);
+                insert_into_table(line, tableName, temporary_data, data_type, outputFile);
             }
             else if (line.find("SELECT * FROM") == 0)
             {
