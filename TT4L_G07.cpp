@@ -40,6 +40,7 @@ void create_database(const string line, vector<vector<string>> &rows_data); // f
 void create_table(const vector<string> column_lines, string &tableName, vector<string> &table_Column, vector<string> &data_type);
 void insert_into_table(const string &line, vector<Row> &table_Row);
 void select_all_from_table_in_csv_mode(const vector<Information> &customer);
+void count_tableRow(const vector<vector<string>> &rows_data);
 
 // function definitions, no global variables
 ofstream outputFile;
@@ -166,6 +167,10 @@ void delete_from_table(const string &line, vector<Information> &customer) {
     outputFile << "> " << line << endl;
 }
 
+void count_tableRow(const vector<vector<string>> &rows_data);
+{
+    cout << rows_data.size() << endl;
+}
 
 int main()
 {
