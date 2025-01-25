@@ -30,6 +30,7 @@ void create_database(const string line, vector<vector<string>> &temporary_data, 
 void create_table(const vector<string> column_lines, string &tableName, vector<string> &table_Column, vector<string> &data_type);
 void insert_into_table(const string &line, const string tableName, const vector<vector<string>> temporary_data, const vector<string> data_type, ofstream &outputFile);
 void select_all_from_table_in_csv_mode(const string &line, const string &tableName, const vector<string> &table_Column, const vector<vector<string>> &rows_data, ofstream &outputFile);
+void update_data_from_table(const string &line, const vector<string> &table_Column, vector<vector<string>> &rows_data, ofstream &outputFile);
 void delete_from_table(const string &line, const string &tableName, const vector<string> &table_Column, vector<vector<string>> &rows_data, ofstream &outputFile);
 void count_tableRow(const vector<vector<string>> &rows_data);
 
@@ -192,6 +193,70 @@ void select_all_from_table_in_csv_mode(const string &line, const string &tableNa
 
     }
 }
+void update_data_from_table(const string &line,const string &tableName, const vector<string> &table_Column, vector<vector<string>> &rows_data, ofstream &outputFile)
+{
+   // Find the positions of SET and WHERE
+     size_t set_pos = line.find("SET");
+     size_t where_pos = line.find("WHERE");
+
+    // Extract SET and WHERE commands
+     string set_command = set_command.substr(set_pos + 4,where_pos-(set_pos + 4)-1);
+     string where_command = line.substr(where_pos + 6, line.find(";") - (where_pos + 6));
+
+    // Extract column and value for SET
+     size_t set_equal_pos = set_command.find("=");
+     string set_col = set_command.substr(0, set_equal_pos);
+     string set_data = set_command.substr(set_equal_pos + 1);
+
+   // Extract column and value for WHERE
+     size_t where_equal_pos = where_command.find("=");
+     string where_col = where_command.substr(0, where_equal_pos);
+     string where_data = where_command.substr(where_equal_pos + 1);
+
+    //Remove quotes ("'") from SET and WHERE
+    if (set_data.find("'") != string::npos)
+    {
+        size_t quote_pos = set_data.find("'");
+        set_data = set_data.substr(quote_pos + 1, set_data.size() - 2);
+        //cout << set_data << endl;
+    }
+    if (set_data.find("'") != string::npos)
+    {
+        size_t quote_pos = set_data.find("'");
+        set_data = set_data.substr(quote_pos + 1, set_data.size() - 2);
+        //cout << set_data << endl;
+    }
+
+
+    int set_col_index;
+    int where_col_index;
+
+
+      for (int i = 0; i < table_Column.size(); i++)
+      {
+        if (where_col == table_Column[i])
+            where_col_index = i;
+            /*for (int j = 0; j < rows_data.size(); j++)
+            {
+                if (where_data == rows_data[j][i])
+                    where_data_index = j;
+            }*/
+        if (set_col == table_Column[i])
+             set_col_index = i;
+            /*for (int j = 0; j < rows_data.size(); j++)
+            {
+                if (set_data == rows_data[j][i])
+                    set_data_index = j;
+            }*/
+      }
+
+      for (auto& row : rows_data)
+    {
+        if (row[where_col_index] == where_data)
+            row[set_col_index] = set_data;
+    }
+}
+
 
 void delete_from_table(const string &line, const string &tableName, const vector<string> &table_Column, vector<vector<string>> &rows_data, ofstream &outputFile)
 {
@@ -235,6 +300,7 @@ void delete_from_table(const string &line, const string &tableName, const vector
         cerr << "Warning - table not found!!" << endl;
     }
 }
+
 
 void count_tableRow(const vector<vector<string>> &rows_data, ofstream &outputFile)
 {
